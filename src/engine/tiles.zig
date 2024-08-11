@@ -18,19 +18,19 @@ pub const Tile = struct {
     fg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 255, 255, 255 } },
     bg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 255, 255, 255 } },
 
-    pub fn init(name: TileName) Tile {
+    pub fn update(self: *Tile, name: TileName) void {
         switch (name) {
 
             //floors
-            .floor_standard => return .{
-                .glyph = ".",
-                .block_movement = false,
+            .floor_standard => {
+                self.glyph = ".";
+                self.block_movement = false;
             },
 
             // walls
-            .wall_standard => return .{
-                .glyph = "█",
-                .block_movement = true,
+            .wall_standard => return {
+                self.glyph = "█";
+                self.block_movement = true;
             },
         }
     }

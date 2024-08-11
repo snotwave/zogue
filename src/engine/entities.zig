@@ -1,16 +1,5 @@
 const vaxis = @import("vaxis");
 
-pub const Tile = struct {
-    glyph: []const u8 = " ",
-    block_movement: bool = false,
-    block_vision: bool = false,
-    visible: bool = false,
-    revealed: bool = false,
-
-    fg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 255, 255, 255 } },
-    bg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 255, 255, 255 } },
-};
-
 const Entity_Type = enum {
     player,
     npc,

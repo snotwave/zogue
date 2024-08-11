@@ -36,7 +36,7 @@ const Rectangle = struct {
     pub fn map_add(self: Rectangle, map: *[world_width][world_height]tile.Tile) void {
         for (self.ul_xpos..self.ul_xpos + self.width) |x| {
             for (self.ul_ypos..self.ul_ypos + self.height) |y| {
-                map[x][y] = tile.Tile.init(self.id);
+                map[x][y].update(self.id);
             }
         }
     }
@@ -45,7 +45,7 @@ const Rectangle = struct {
 pub fn worldgen_fill(map: *[world_width][world_height]tile.Tile) void {
     for (0..world_height) |y| {
         for (0..world_width) |x| {
-            map[x][y] = tile.Tile.init(.wall_standard);
+            map[x][y].update(.wall_standard);
         }
     }
 }
@@ -70,7 +70,7 @@ pub fn worldgen_make_border(map: *[world_width][world_height]tile.Tile) void {
     for (0..world_height) |y| {
         for (0..world_width) |x| {
             if (x == 0 or x == world_width - 1 or y == 0 or y == world_height - 1) {
-                map[x][y] = tile.Tile.init(.wall_standard);
+                map[x][y].update(.wall_standard);
             }
         }
     }

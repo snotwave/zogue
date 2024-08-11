@@ -24,7 +24,10 @@ pub const World = struct {
     terrain: world_type = .Swamp,
 
     pub fn init() World {
+
+        // initialize an empty worldmap with default tile values
         var map: [world_width][world_height]tile.Tile = undefined;
+        @memset(&map, .{.{}} ** world_height);
 
         worldgen.worldgen(&map);
 
