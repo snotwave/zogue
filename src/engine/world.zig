@@ -1,31 +1,32 @@
 const vaxis = @import("vaxis");
 
 const entity = @import("entities.zig");
+const tile = @import("tiles.zig");
+const worldgen = @import("worldgen.zig");
 
-const world_width: usize = 320;
-const world_height: usize = 72;
+pub const world_width: usize = 320;
+pub const world_height: usize = 72;
 
 // MUST ALWAYS BE DIVISORS OF world_width AND world_height RESPECTIVELY
+// (if not can cause over/underflows)
 pub const view_width: usize = 80;
 pub const view_height: usize = 24;
 
+pub const world_type = enum {
+    Swamp,
+    Forest,
+    Dungeon,
+};
+
 pub const World = struct {
     player: entity.Entity,
-    map: [world_width][world_height]entity.Tile,
+    map: [world_width][world_height]tile.Tile,
+    terrain: world_type = .Swamp,
 
     pub fn init() World {
-        var map: [world_width][world_height]entity.Tile = undefined;
-        @memset(&map, .{.{}} ** world_height);
+        var map: [world_width][world_height]tile.Tile = undefined;
 
-        for (0..world_height) |y| {
-            for (0..world_width) |x| {
-                if (x == 0 or x == world_width - 1 or y == 0 or y == world_height - 1)
-                    map[x][y] = .{ .glyph = "#", .block_movement = true, .fg_color = .{ .rgb = [_]u8{ 78, 74, 78 } } }
-                else {
-                    map[x][y] = .{ .glyph = ".", .fg_color = .{ .rgb = [_]u8{ 117, 113, 97 } } };
-                }
-            }
-        }
+        worldgen.worldgen(&map);
 
         return .{
             .player = entity.Entity.init(9, 9, "Ћ", .player),
