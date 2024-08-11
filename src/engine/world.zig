@@ -20,14 +20,9 @@ pub const World = struct {
         for (0..world_height) |y| {
             for (0..world_width) |x| {
                 if (x == 0 or x == world_width - 1 or y == 0 or y == world_height - 1)
-                    map[x][y] = .{
-                        .glyph = "#",
-                        .block_movement = true,
-                    }
+                    map[x][y] = .{ .glyph = "#", .block_movement = true, .fg_color = .{ .rgb = [_]u8{ 78, 74, 78 } } }
                 else {
-                    map[x][y] = .{
-                        .glyph = ".",
-                    };
+                    map[x][y] = .{ .glyph = ".", .fg_color = .{ .rgb = [_]u8{ 117, 113, 97 } } };
                 }
             }
         }
@@ -58,7 +53,8 @@ pub const World = struct {
                 const relx = @rem(x, view_width);
                 const rely = @rem(y, view_height);
                 const char: vaxis.Cell.Character = .{ .grapheme = self.map[x][y].glyph };
-                window.writeCell(relx + 1, rely + 1, .{ .char = char });
+                const style: vaxis.Cell.Style = .{ .fg = self.map[x][y].fg_color };
+                window.writeCell(relx + 1, rely + 1, .{ .char = char, .style = style });
             }
         }
 
