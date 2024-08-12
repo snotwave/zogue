@@ -2,6 +2,8 @@ const world = @import("world.zig");
 const entity = @import("entities.zig");
 const tile = @import("tiles.zig");
 
+const euc_dist = @import("functions.zig").euc_dist;
+
 const std = @import("std");
 
 const rand = std.crypto.random;
@@ -10,13 +12,13 @@ const world_width = world.world_width;
 const world_height = world.world_height;
 
 const Rectangle = struct {
-    height: usize,
-    width: usize,
-    ul_xpos: usize,
-    ul_ypos: usize,
-    ce_xpos: usize,
-    ce_ypos: usize,
-    id: tile.TileName,
+    height: usize = 0,
+    width: usize = 0,
+    ul_xpos: usize = 0,
+    ul_ypos: usize = 0,
+    ce_xpos: usize = 0,
+    ce_ypos: usize = 0,
+    id: tile.TileName = .floor_standard,
 
     pub fn create(x: usize, y: usize, width: usize, height: usize, id: tile.TileName) Rectangle {
         const ce_xpos = x + @divFloor(width, 2);
@@ -51,18 +53,57 @@ pub fn worldgen_fill(map: *[world_width][world_height]tile.Tile) void {
 }
 
 pub fn worldgen_make_rects(map: *[world_width][world_height]tile.Tile) void {
-    const rect_count = 35 + @rem(rand.int(usize), 10);
+    const rect_count = 50;
     const max_width = 30;
     const max_height = 30;
 
-    for (0..rect_count) |_| {
+    var rects: [rect_count]Rectangle = undefined;
+    @memset(&rects, .{});
+
+    for (0..rect_count) |i| {
         const x = @rem(rand.int(usize), world_width - max_width);
         const y = @rem(rand.int(usize), world_height - max_height);
-        const width = 4 + @rem(rand.int(usize), max_width - 4);
+        const width = 6 + @rem(rand.int(usize), max_width - 6);
         const height = 6 + @rem(rand.int(usize), max_height - 6);
 
-        const rect = Rectangle.create(x, y, width, height, .floor_standard);
-        rect.map_add(map);
+        rects[i] = Rectangle.create(x, y, width, height, .floor_standard);
+        rects[i].map_add(map);
+
+        if (i < rect_count - 1) {
+            worldgen_tunnel(rects[i], rects[i + 1], map);
+        }
+        if (i > 0) {
+            worldgen_tunnel(rects[i - 1], rects[i], map);
+        }
+    }
+}
+
+pub fn worldgen_tunnel(rect_1: Rectangle, rect_2: Rectangle, map: *[world_width][world_height]tile.Tile) void {
+    const cx1 = rect_1.ce_xpos;
+    const cy1 = rect_1.ce_ypos;
+    const cx2 = rect_2.ce_xpos;
+    const cy2 = rect_2.ce_ypos;
+
+    var tunnelx = cx1;
+    var tunnely = cy1;
+
+    while (true) {
+        if (euc_dist((tunnelx - 1), cx2) < (euc_dist((tunnelx), cx2))) {
+            tunnelx -= 1;
+        } else if (euc_dist((tunnelx + 1), cx2) < (euc_dist((tunnelx), cx2))) {
+            tunnelx += 1;
+        } else if (euc_dist((tunnely - 1), cy2) < (euc_dist((tunnely), cy2))) {
+            tunnely -= 1;
+        } else if (euc_dist((tunnely + 1), cy2) < (euc_dist((tunnely), cy2))) {
+            tunnely += 1;
+        } else break;
+
+        for (0..@rem(rand.int(usize), 3) + 1) |i| {
+            map[tunnelx + i][tunnely + i].update(.floor_standard);
+            map[tunnelx - i][tunnely + i].update(.floor_standard);
+            map[tunnelx + i][tunnely - i].update(.floor_standard);
+            map[tunnelx - i][tunnely - i].update(.floor_standard);
+        }
     }
 }
 

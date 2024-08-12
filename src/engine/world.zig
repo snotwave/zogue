@@ -1,9 +1,6 @@
 const std = @import("std");
 const vaxis = @import("vaxis");
 
-var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-const allocator = gpa.allocator();
-
 const entity = @import("entities.zig");
 const tile = @import("tiles.zig");
 const worldgen = @import("worldgen.zig");
@@ -40,7 +37,15 @@ pub const World = struct {
         var entities: [entity_limit]entity.Entity = undefined;
         @memset(&entities, .{});
 
-        entities[0] = entity.Entity.init(9, 9, .player);
+        for (0..view_height) |y| {
+            for (0..view_width) |x| {
+                if (map[x][y].block_movement == true and map[x + 1][y + 1].block_movement == true)
+                    continue
+                else
+                    entities[0] = entity.Entity.init(x, y, .player);
+            }
+        }
+        // entities[0] = entity.Entity.init(9, 9, .player);
 
         return .{
             .entities = entities,
