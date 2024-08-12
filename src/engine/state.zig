@@ -24,7 +24,7 @@ pub const AppState = struct {
             .running = true,
             .terminal = try vaxis.Tty.init(),
             .instance = try vaxis.init(allocator, .{}),
-            .world = world.World.init(),
+            .world = try world.World.init(),
         };
     }
 

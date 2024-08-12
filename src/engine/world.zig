@@ -1,4 +1,8 @@
+const std = @import("std");
 const vaxis = @import("vaxis");
+
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+const allocator = gpa.allocator();
 
 const entity = @import("entities.zig");
 const tile = @import("tiles.zig");
@@ -12,6 +16,8 @@ pub const world_height: usize = 72;
 pub const view_width: usize = 80;
 pub const view_height: usize = 24;
 
+pub const entity_limit: usize = 128;
+
 pub const world_type = enum {
     Swamp,
     Forest,
@@ -19,11 +25,11 @@ pub const world_type = enum {
 };
 
 pub const World = struct {
-    player: entity.Entity,
+    entities: [entity_limit]entity.Entity,
     map: [world_width][world_height]tile.Tile,
     terrain: world_type = .Swamp,
 
-    pub fn init() World {
+    pub fn init() !World {
 
         // initialize an empty worldmap with default tile values
         var map: [world_width][world_height]tile.Tile = undefined;
@@ -31,19 +37,47 @@ pub const World = struct {
 
         worldgen.worldgen(&map);
 
+        var entities: [entity_limit]entity.Entity = undefined;
+        @memset(&entities, .{});
+
+        entities[0] = entity.Entity.init(9, 9, .player);
+
         return .{
-            .player = entity.Entity.init(9, 9, "Ћ", .player),
+            .entities = entities,
             .map = map,
         };
     }
 
-    pub fn draw(self: *World, window: vaxis.Window) void {
-        const player_relx = @rem(self.player.xpos, view_width);
-        const player_rely = @rem(self.player.ypos, view_height);
+    fn draw_tiles(self: *World, window: vaxis.Window, xmin: usize, xmax: usize, ymin: usize, ymax: usize) void {
+        for (ymin..ymax) |y| {
+            for (xmin..xmax) |x| {
+                const relx = @rem(x, view_width);
+                const rely = @rem(y, view_height);
+                self.map[x][y].draw(window, relx, rely);
+            }
+        }
+    }
 
+    fn draw_entities(self: *World, window: vaxis.Window, xmin: usize, xmax: usize, ymin: usize, ymax: usize) void {
+        for (0..entity_limit) |i| {
+            const this_entity = &self.entities[i];
+            const x = this_entity.xpos;
+            const y = this_entity.ypos;
+
+            if ((this_entity.e_type != .nothing) and (xmin <= x) and (x <= xmax) and (ymin <= y) and (y <= ymax)) {
+                const relx = @rem(this_entity.xpos, view_width);
+                const rely = @rem(this_entity.ypos, view_height);
+
+                this_entity.draw(window, relx + 1, rely + 1);
+            }
+        }
+    }
+
+    pub fn draw(self: *World, window: vaxis.Window) void {
+        const player = &self.entities[0];
         // splits the world into rooms based on player position
-        const quad_x = @divFloor(self.player.xpos, view_width);
-        const quad_y = @divFloor(self.player.ypos, view_height);
+        const quad_x = @divFloor(player.xpos, view_width);
+        const quad_y = @divFloor(player.ypos, view_height);
 
         // defines the boundaries for those rooms
         const port_xmin = quad_x * view_width;
@@ -52,17 +86,9 @@ pub const World = struct {
         const port_ymax = (quad_y + 1) * view_height;
 
         // draw tiles
-        for (port_ymin..port_ymax) |y| {
-            for (port_xmin..port_xmax) |x| {
-                const relx = @rem(x, view_width);
-                const rely = @rem(y, view_height);
-                const char: vaxis.Cell.Character = .{ .grapheme = self.map[x][y].glyph };
-                const style: vaxis.Cell.Style = .{ .fg = self.map[x][y].fg_color };
-                window.writeCell(relx + 1, rely + 1, .{ .char = char, .style = style });
-            }
-        }
+        self.draw_tiles(window, port_xmin, port_xmax, port_ymin, port_ymax);
 
-        //draw player
-        self.player.draw(window, player_relx + 1, player_rely + 1);
+        // draw_entities
+        self.draw_entities(window, port_xmin, port_xmax, port_ymin, port_ymax);
     }
 };

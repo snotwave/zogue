@@ -3,7 +3,7 @@ const vaxis = @import("vaxis");
 
 pub fn handle_input(state: *engine_state.AppState, key: vaxis.Key) void {
     const map = state.world.map;
-    const player = &state.world.player;
+    const player = &state.world.entities[0];
 
     if (key.matches('q', .{})) {
         state.running = false;
