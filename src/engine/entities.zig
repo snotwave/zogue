@@ -1,6 +1,8 @@
 const vaxis = @import("vaxis");
 const std = @import("std");
 
+const colors = @import("colors.zig");
+
 const Entity_Type = enum {
     player,
     npc,
@@ -13,20 +15,20 @@ pub const Entity = struct {
     dir: usize = 0,
 
     glyph: []const u8 = "",
-    fg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 255, 255, 255 } },
-    bg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 255, 255, 255 } },
+    fg_color: vaxis.Cell.Color = colors.default,
+    bg_color: vaxis.Cell.Color = colors.default,
 
     e_type: Entity_Type = .nothing,
 
     pub fn init(x: usize, y: usize, e_type: Entity_Type) Entity {
         var glyph: []const u8 = " ";
-        var fg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 0, 0, 0 } };
+        var fg_color: vaxis.Cell.Color = colors.white1;
 
         switch (e_type) {
             // set entity starting state based on Entity_Type
             .player => {
                 glyph = "Ћ";
-                fg_color = .{ .rgb = [_]u8{ 52, 101, 36 } };
+                fg_color = colors.orange;
             },
             else => {},
         }
@@ -36,6 +38,7 @@ pub const Entity = struct {
             .ypos = y,
             .glyph = glyph,
             .e_type = e_type,
+            .fg_color = fg_color,
         };
     }
 

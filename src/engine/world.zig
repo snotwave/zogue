@@ -4,6 +4,7 @@ const vaxis = @import("vaxis");
 const entity = @import("entities.zig");
 const tile = @import("tiles.zig");
 const worldgen = @import("worldgen.zig");
+const fov = @import("fov.zig");
 
 pub const world_width: usize = 320;
 pub const world_height: usize = 72;
@@ -89,6 +90,9 @@ pub const World = struct {
         const port_ymin = quad_y * view_height;
         const port_xmax = (quad_x + 1) * view_width;
         const port_ymax = (quad_y + 1) * view_height;
+
+        // draw fov
+        fov.draw_fov(self);
 
         // draw tiles
         self.draw_tiles(window, port_xmin, port_xmax, port_ymin, port_ymax);

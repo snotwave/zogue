@@ -52,6 +52,9 @@ pub fn worldgen_fill(map: *[world_width][world_height]tile.Tile) void {
 
 pub fn worldgen_make_rects(map: *[world_width][world_height]tile.Tile) void {
     const rect_count = 50;
+
+    const min_width = 8;
+    const min_height = 6;
     const max_width = 30;
     const max_height = 30;
 
@@ -61,8 +64,8 @@ pub fn worldgen_make_rects(map: *[world_width][world_height]tile.Tile) void {
     for (0..rect_count) |i| {
         const x = @rem(rand.int(usize), world_width - max_width);
         const y = @rem(rand.int(usize), world_height - max_height);
-        const width = 2 + @rem(rand.int(usize), max_width - 2);
-        const height = 4 + @rem(rand.int(usize), max_height - 4);
+        const width = min_width + @rem(rand.int(usize), max_width - min_width);
+        const height = min_height + @rem(rand.int(usize), max_height - min_height);
 
         rects[i] = Rectangle.create(x, y, width, height, .floor_standard);
         rects[i].map_add(map);
@@ -85,24 +88,32 @@ pub fn worldgen_tunnel(rect_1: Rectangle, rect_2: Rectangle, map: *[world_width]
     var tunnelx = cx1;
     var tunnely = cy1;
 
-    const radius = @rem(rand.int(usize), 3) + 2;
+    const radius = @rem(rand.int(usize), 3) + 1;
 
     while (true) {
-        if (euc_dist((tunnelx - 1), cx2) < (euc_dist((tunnelx), cx2))) {
+        if (euc_dist((tunnelx - 1), cx2) < (euc_dist((tunnelx), cx2)) and tunnelx - 1 > 0) {
             tunnelx -= 1;
-        } else if (euc_dist((tunnelx + 1), cx2) < (euc_dist((tunnelx), cx2))) {
+        } else if (euc_dist((tunnelx + 1), cx2) < (euc_dist((tunnelx), cx2)) and tunnelx + 1 < world_width) {
             tunnelx += 1;
-        } else if (euc_dist((tunnely - 1), cy2) < (euc_dist((tunnely), cy2))) {
+        } else if (euc_dist((tunnely - 1), cy2) < (euc_dist((tunnely), cy2)) and tunnely - 1 > 0) {
             tunnely -= 1;
-        } else if (euc_dist((tunnely + 1), cy2) < (euc_dist((tunnely), cy2))) {
+        } else if (euc_dist((tunnely + 1), cy2) < (euc_dist((tunnely), cy2)) and tunnely + 1 < world_height) {
             tunnely += 1;
         } else break;
 
+        map[tunnelx][tunnely].update(.floor_standard);
+
         for (1..radius) |i| {
-            map[tunnelx + i][tunnely + i].update(.floor_standard);
-            map[tunnelx - i][tunnely + i].update(.floor_standard);
-            map[tunnelx + i][tunnely - i].update(.floor_standard);
-            map[tunnelx - i][tunnely - i].update(.floor_standard);
+            const minx = @min(tunnelx -% i, 1);
+            const miny = @min(tunnely -% i, 1);
+
+            const maxx = @max(tunnelx + i, world_width - 1);
+            const maxy = @max(tunnely + i, world_height - 1);
+
+            map[maxx][maxy].update(.floor_standard);
+            map[minx][maxy].update(.floor_standard);
+            map[maxx][miny].update(.floor_standard);
+            map[minx][miny].update(.floor_standard);
         }
     }
 }

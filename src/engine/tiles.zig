@@ -1,4 +1,5 @@
 const vaxis = @import("vaxis");
+const colors = @import("colors.zig");
 
 pub const TileName = enum {
     // floor names
@@ -12,11 +13,11 @@ pub const Tile = struct {
     glyph: []const u8 = " ",
     block_movement: bool = false,
     block_vision: bool = false,
-    visible: bool = true,
-    revealed: bool = true,
+    visible: bool = false,
+    revealed: bool = false,
 
-    fg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 255, 255, 255 } },
-    bg_color: vaxis.Cell.Color = .{ .rgb = [_]u8{ 255, 255, 255 } },
+    fg_color: vaxis.Cell.Color = colors.default,
+    bg_color: vaxis.Cell.Color = colors.default,
 
     pub fn update(self: *Tile, name: TileName) void {
         switch (name) {
@@ -25,21 +26,28 @@ pub const Tile = struct {
             .floor_standard => {
                 self.glyph = ".";
                 self.block_movement = false;
-                self.fg_color = .{ .rgb = [_]u8{ 117, 113, 97 } };
+                self.fg_color = colors.white2;
             },
 
             // walls
             .wall_standard => return {
                 self.glyph = "█";
                 self.block_movement = true;
-                self.fg_color = .{ .rgb = [_]u8{ 78, 74, 78 } };
+                self.fg_color = colors.white1;
             },
         }
     }
 
     pub fn draw(self: *Tile, window: vaxis.Window, rel_x: usize, rel_y: usize) void {
-        const char: vaxis.Cell.Character = .{ .grapheme = self.glyph };
-        const style: vaxis.Cell.Style = .{ .fg = self.fg_color };
+        const char: vaxis.Cell.Character = switch (self.revealed) {
+            false => .{ .grapheme = " " },
+            true => .{ .grapheme = self.glyph },
+        };
+
+        const style: vaxis.Cell.Style = switch (self.visible) {
+            false => .{ .fg = colors.grey2 },
+            true => .{ .fg = self.fg_color },
+        };
 
         window.writeCell(rel_x + 1, rel_y + 1, .{ .char = char, .style = style });
     }
