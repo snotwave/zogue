@@ -25,6 +25,7 @@ pub const Tile = struct {
             .floor_standard => {
                 self.glyph = ".";
                 self.block_movement = false;
+                self.fg_color = .{ .rgb = [_]u8{ 117, 113, 97 } };
             },
 
             // walls

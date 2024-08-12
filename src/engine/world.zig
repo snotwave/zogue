@@ -37,10 +37,10 @@ pub const World = struct {
         var entities: [entity_limit]entity.Entity = undefined;
         @memset(&entities, .{});
 
-        yit: for (0..view_height) |y| {
-            for (0..view_width) |x| {
-                if (map[x][y].block_movement == false) {
-                    entities[0] = entity.Entity.init(x, y, .player);
+        yit: for (0..view_width) |x| {
+            for (0..view_height) |y| {
+                if (map[x][y].block_movement == false and map[x + 1][y + 1].block_movement == false) {
+                    entities[0] = entity.Entity.init(x + 1, y + 1, .player);
                     break :yit;
                 } else continue;
             }

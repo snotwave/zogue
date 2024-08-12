@@ -4,9 +4,7 @@ const tile = @import("tiles.zig");
 
 const euc_dist = @import("functions.zig").euc_dist;
 
-const std = @import("std");
-
-const rand = std.crypto.random;
+const rand = @import("std").crypto.random;
 
 const world_width = world.world_width;
 const world_height = world.world_height;
@@ -63,8 +61,8 @@ pub fn worldgen_make_rects(map: *[world_width][world_height]tile.Tile) void {
     for (0..rect_count) |i| {
         const x = @rem(rand.int(usize), world_width - max_width);
         const y = @rem(rand.int(usize), world_height - max_height);
-        const width = 6 + @rem(rand.int(usize), max_width - 6);
-        const height = 6 + @rem(rand.int(usize), max_height - 6);
+        const width = 2 + @rem(rand.int(usize), max_width - 2);
+        const height = 4 + @rem(rand.int(usize), max_height - 4);
 
         rects[i] = Rectangle.create(x, y, width, height, .floor_standard);
         rects[i].map_add(map);
@@ -87,6 +85,8 @@ pub fn worldgen_tunnel(rect_1: Rectangle, rect_2: Rectangle, map: *[world_width]
     var tunnelx = cx1;
     var tunnely = cy1;
 
+    const radius = @rem(rand.int(usize), 3) + 2;
+
     while (true) {
         if (euc_dist((tunnelx - 1), cx2) < (euc_dist((tunnelx), cx2))) {
             tunnelx -= 1;
@@ -98,7 +98,7 @@ pub fn worldgen_tunnel(rect_1: Rectangle, rect_2: Rectangle, map: *[world_width]
             tunnely += 1;
         } else break;
 
-        for (0..@rem(rand.int(usize), 3) + 1) |i| {
+        for (1..radius) |i| {
             map[tunnelx + i][tunnely + i].update(.floor_standard);
             map[tunnelx - i][tunnely + i].update(.floor_standard);
             map[tunnelx + i][tunnely - i].update(.floor_standard);
