@@ -24,21 +24,28 @@ pub const Tile = struct {
 
             //floors
             .floor_standard => {
-                self.glyph = ".";
+                self.glyph = "~";
+                self.block_vision = false;
                 self.block_movement = false;
-                self.fg_color = colors.white2;
+                self.fg_color = colors.red;
             },
 
             // walls
             .wall_standard => return {
                 self.glyph = "█";
                 self.block_movement = true;
-                self.fg_color = colors.white1;
+                self.block_vision = true;
+                self.fg_color = colors.orange;
             },
         }
     }
 
     pub fn draw(self: *Tile, window: vaxis.Window, rel_x: usize, rel_y: usize) void {
+        self.revealed = switch (self.visible) {
+            false => self.revealed,
+            true => true,
+        };
+
         const char: vaxis.Cell.Character = switch (self.revealed) {
             false => .{ .grapheme = " " },
             true => .{ .grapheme = self.glyph },

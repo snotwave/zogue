@@ -4,7 +4,7 @@ const vaxis = @import("vaxis");
 const entity = @import("entities.zig");
 const input = @import("input.zig");
 const world = @import("world.zig");
-const ui = @import("ui.zig");
+const ui = @import("../ui/ui.zig");
 
 const Event = union(enum) {
     key_press: vaxis.Key,

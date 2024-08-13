@@ -4,7 +4,7 @@ const pow = @import("std").math.pow;
 const sqrt = @import("std").math.sqrt;
 
 pub fn sign_euc_dist(x1: usize, x2: usize) bool {
-    if (x1 > x2) {
+    if (x1 >= x2) {
         return true;
     } else {
         return false;
