@@ -11,7 +11,7 @@ const dtr = math.degreesToRadians;
 const round = math.round;
 const lossyCast = math.lossyCast;
 
-const radius: usize = 20;
+const radius: usize = 32;
 
 pub fn reset_fov(world_state: *world.World) void {
     for (0..world.world_width) |x| {

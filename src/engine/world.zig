@@ -6,13 +6,17 @@ const tile = @import("tiles.zig");
 const worldgen = @import("worldgen/worldgen.zig");
 const fov = @import("fov.zig");
 
-pub const world_width: usize = 320;
-pub const world_height: usize = 72;
+pub const view_width: usize = 110;
+pub const view_height: usize = 32;
+
+pub const vrooms: usize = 4;
+pub const hrooms: usize = 4;
+
+pub const world_width: usize = view_width * vrooms;
+pub const world_height: usize = view_height * hrooms;
 
 // MUST ALWAYS BE DIVISORS OF world_width AND world_height RESPECTIVELY
 // (if not can cause over/underflows)
-pub const view_width: usize = 80;
-pub const view_height: usize = 24;
 
 pub const entity_limit: usize = 128;
 

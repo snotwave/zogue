@@ -1,26 +1,30 @@
 const engine_state = @import("state.zig");
 const vaxis = @import("vaxis");
 
-pub fn handle_input(state: *engine_state.AppState, key: vaxis.Key) void {
+const Key = vaxis.Key;
+
+pub fn handle_input(state: *engine_state.AppState, key: Key) void {
     const map = state.world.map;
     const player = &state.world.entities[0];
 
     if (key.matches('q', .{})) {
         state.running = false;
     }
-    if (key.matches(vaxis.Key.left, .{})) {
+
+    // tank controls
+    if (key.matches(Key.left, .{})) {
         if (player.dir == 0)
             player.dir = 7
         else
             player.dir -= 1;
     }
-    if (key.matches(vaxis.Key.right, .{})) {
+    if (key.matches(Key.right, .{})) {
         if (player.dir == 7)
             player.dir = 0
         else
             player.dir += 1;
     }
-    if (key.matches(vaxis.Key.up, .{})) {
+    if (key.matches(Key.up, .{})) {
         switch (player.dir) {
             0 => if (map[player.xpos + 1][player.ypos].block_movement == false) {
                 player.xpos += 1;
@@ -53,7 +57,7 @@ pub fn handle_input(state: *engine_state.AppState, key: vaxis.Key) void {
             else => {},
         }
     }
-    if (key.matches(vaxis.Key.down, .{})) {
+    if (key.matches(Key.down, .{})) {
         switch (player.dir) {
             0 => if (map[player.xpos - 1][player.ypos].block_movement == false) {
                 player.xpos -= 1;
@@ -85,5 +89,23 @@ pub fn handle_input(state: *engine_state.AppState, key: vaxis.Key) void {
             },
             else => {},
         }
+    }
+
+    // absolute controls/strafing
+    if (key.matches(Key.down, .{ .ctrl = true })) {
+        if (map[player.xpos][player.ypos + 1].block_movement == false)
+            player.ypos += 1;
+    }
+    if (key.matches(Key.up, .{ .ctrl = true })) {
+        if (map[player.xpos][player.ypos - 1].block_movement == false)
+            player.ypos -= 1;
+    }
+    if (key.matches(Key.right, .{ .ctrl = true })) {
+        if (map[player.xpos + 1][player.ypos].block_movement == false)
+            player.xpos += 1;
+    }
+    if (key.matches(Key.left, .{ .ctrl = true })) {
+        if (map[player.xpos - 1][player.ypos].block_movement == false)
+            player.xpos -= 1;
     }
 }
