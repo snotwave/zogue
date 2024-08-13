@@ -28,6 +28,9 @@ pub fn set_fov(world_state: *world.World) void {
     const maxdir: f32 = @floatFromInt(mindir + 40);
 
     var dir: f32 = @floatFromInt(mindir);
+
+    world_state.map[player.xpos][player.ypos].visible = true;
+
     while (dir <= maxdir) : (dir += 0.09) {
         const ax = @cos(dtr(dir));
         const ay = @sin(dtr(dir));

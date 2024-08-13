@@ -46,7 +46,6 @@ pub const World = struct {
                 } else continue;
             }
         }
-        // entities[0] = entity.Entity.init(9, 9, .player);
 
         return .{
             .entities = entities,
@@ -71,10 +70,22 @@ pub const World = struct {
             const y = this_entity.ypos;
 
             if ((this_entity.e_type != .nothing) and (xmin <= x) and (x <= xmax) and (ymin <= y) and (y <= ymax)) {
-                const relx = @rem(this_entity.xpos, view_width);
-                const rely = @rem(this_entity.ypos, view_height);
+                var relx: usize = 0;
+                var rely: usize = 0;
 
-                this_entity.draw(window, relx + 1, rely + 1);
+                // if the tile entity is on is visible, render entity at its true
+                // coordinates. if not, render it at its last visible coordinates.
+                if (self.map[x][y].visible == true) {
+                    this_entity.prev_x = this_entity.xpos;
+                    this_entity.prev_y = this_entity.ypos;
+                    relx = @rem(this_entity.xpos, view_width);
+                    rely = @rem(this_entity.ypos, view_height);
+                } else {
+                    relx = @rem(this_entity.prev_x, view_width);
+                    rely = @rem(this_entity.prev_y, view_height);
+                }
+
+                this_entity.draw(window, relx + 1, rely + 1, self);
             }
         }
     }
