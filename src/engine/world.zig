@@ -3,7 +3,7 @@ const vaxis = @import("vaxis");
 
 const entity = @import("entities.zig");
 const tile = @import("tiles.zig");
-const worldgen = @import("worldgen.zig");
+const worldgen = @import("worldgen/worldgen.zig");
 const fov = @import("fov.zig");
 
 pub const world_width: usize = 320;
