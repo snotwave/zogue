@@ -30,8 +30,9 @@ pub const World = struct {
     entities: [entity_limit]entity.Entity,
     map: [world_width][world_height]tile.Tile,
     terrain: world_type = .Swamp,
+    layer: usize,
 
-    pub fn init() !World {
+    pub fn init(layer: usize) !World {
 
         // initialize an empty worldmap with default tile values
         var map: [world_width][world_height]tile.Tile = undefined;
@@ -54,6 +55,7 @@ pub const World = struct {
         return .{
             .entities = entities,
             .map = map,
+            .layer = layer,
         };
     }
 

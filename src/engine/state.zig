@@ -6,6 +6,11 @@ const input = @import("input.zig");
 const world = @import("world.zig");
 const ui = @import("../ui/ui.zig");
 
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+const alloc = gpa.allocator();
+
+const layers: usize = 10;
+
 const Event = union(enum) {
     key_press: vaxis.Key,
     winsize: vaxis.Winsize,
@@ -16,15 +21,22 @@ pub const AppState = struct {
     running: bool,
     terminal: vaxis.Tty,
     instance: vaxis.Vaxis,
-    world: world.World,
+    worlds: []world.World,
+    current_layer: usize = 0,
 
     pub fn init(allocator: std.mem.Allocator) !AppState {
+        var worlds: []world.World = try alloc.alloc(world.World, layers);
+
+        for (0..layers) |i| {
+            worlds[i] = try world.World.init(i);
+        }
+
         return .{
             .allocator = allocator,
             .running = true,
             .terminal = try vaxis.Tty.init(),
             .instance = try vaxis.init(allocator, .{}),
-            .world = try world.World.init(),
+            .worlds = worlds,
         };
     }
 
@@ -70,10 +82,11 @@ pub const AppState = struct {
 
     pub fn draw(self: *AppState) void {
         const win = self.instance.window();
+        const current_layer = self.current_layer;
 
         win.clear();
 
-        self.world.draw(win);
+        self.worlds[current_layer].draw(win);
         ui.draw_border(win);
     }
 };

@@ -4,18 +4,19 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    // Define dependencies here
-    const vaxis_dep = b.dependency("vaxis", .{ .target = target, .optimize = optimize });
-
     const exe = b.addExecutable(.{
-        .name = "vaxis_roguelike",
+        .name = "zig_roguelike",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
 
-    // Import dependencies here
+    const vaxis_dep = b.dependency("vaxis", .{ .target = target, .optimize = optimize });
     exe.root_module.addImport("vaxis", vaxis_dep.module("vaxis"));
+
+    const znoise = b.dependency("znoise", .{});
+    exe.root_module.addImport("znoise", znoise.module("root"));
+    exe.linkLibrary(znoise.artifact("FastNoiseLite"));
 
     b.installArtifact(exe);
 

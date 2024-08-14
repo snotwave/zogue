@@ -9,7 +9,7 @@ const rand = @import("std").crypto.random;
 const world_width = world.world_width;
 const world_height = world.world_height;
 
-const Rectangle = struct {
+pub const Rectangle = struct {
     height: usize = 0,
     width: usize = 0,
     ul_xpos: usize = 0,

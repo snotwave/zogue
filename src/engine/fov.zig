@@ -11,6 +11,7 @@ const dtr = math.degreesToRadians;
 const round = math.round;
 const lossyCast = math.lossyCast;
 
+const view_fov: usize = 45;
 const radius: usize = 32;
 
 pub fn reset_fov(world_state: *world.World) void {
@@ -24,8 +25,8 @@ pub fn reset_fov(world_state: *world.World) void {
 pub fn set_fov(world_state: *world.World) void {
     const player = world_state.entities[0];
 
-    const mindir = (360 + ((player.dir) * 45) - 20);
-    const maxdir: f32 = @floatFromInt(mindir + 40);
+    const mindir = (360 + ((player.dir) * 45) - view_fov);
+    const maxdir: f32 = @floatFromInt(mindir + 2 * view_fov);
 
     var dir: f32 = @floatFromInt(mindir);
 

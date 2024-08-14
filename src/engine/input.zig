@@ -4,11 +4,17 @@ const vaxis = @import("vaxis");
 const Key = vaxis.Key;
 
 pub fn handle_input(state: *engine_state.AppState, key: Key) void {
-    const map = state.world.map;
-    const player = &state.world.entities[0];
+    const current_layer = state.current_layer;
+
+    const map = state.worlds[current_layer].map;
+    const player = &state.worlds[current_layer].entities[0];
 
     if (key.matches('q', .{})) {
         state.running = false;
+    }
+
+    if (key.matches('l', .{})) {
+        state.current_layer += 1;
     }
 
     // tank controls
