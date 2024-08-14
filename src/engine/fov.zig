@@ -11,7 +11,7 @@ const dtr = math.degreesToRadians;
 const round = math.round;
 const lossyCast = math.lossyCast;
 
-const view_fov: usize = 45;
+const view_fov: usize = 60;
 const radius: usize = 32;
 
 pub fn reset_fov(world_state: *world.World) void {
@@ -49,7 +49,7 @@ pub fn set_fov(world_state: *world.World) void {
             const ux: usize = lossyCast(usize, round(player_x));
             const uy: usize = lossyCast(usize, round(player_y));
 
-            if (ux > world.world_width or uy > world.world_height) {
+            if (ux >= world.world_width or uy >= world.world_height) {
                 break;
             }
 
@@ -65,6 +65,8 @@ pub fn draw_fov(world_state: *world.World) void {
     reset_fov(world_state);
     set_fov(world_state);
 }
+
+// dead code
 
 //pub fn draw_fov(world_state: *world.World) void {
 //    const player: entity.Entity = world_state.entities[0];
