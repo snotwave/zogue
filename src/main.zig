@@ -1,7 +1,7 @@
 const std = @import("std");
 const vaxis = @import("vaxis");
 
-const engine_state = @import("engine/state.zig");
+const s = @import("state/state.zig");
 
 pub const panic = vaxis.panic_handler;
 pub const std_options: std.Options = .{
@@ -20,10 +20,9 @@ pub fn main() !void {
             std.log.err("memory leak", .{});
         }
     }
-
     const allocator = gpa.allocator();
 
-    var engine = try engine_state.AppState.init(allocator);
+    var engine = try s.State_All.init(allocator);
     defer engine.deinit();
 
     try engine.run();

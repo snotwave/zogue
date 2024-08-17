@@ -1,23 +1,5 @@
-// helpful functions :)
-
 const pow = @import("std").math.pow;
 const sqrt = @import("std").math.sqrt;
-
-pub fn sign_euc_dist(x1: usize, x2: usize) bool {
-    if (x1 >= x2) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-pub fn plus_sign(x1: usize, sign: bool) usize {
-    if (sign == true) {
-        return x1 + 1;
-    } else {
-        return x1 -% 1;
-    }
-}
 
 pub fn euc_dist(x1: usize, x2: usize) usize {
     var dist: usize = 0;
