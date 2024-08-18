@@ -4,6 +4,7 @@ const Entity = @import("../../objects/entity.zig").Entity;
 const Tile = @import("../../objects/tile.zig").Tile;
 const Tile_Name = @import("../../objects/tile.zig").Tile_Name;
 const Hero = @import("../../objects/hero.zig").Hero;
+const State_World_Flags = @import("worldstate_flags.zig").State_World_Flags;
 
 const update_fov = @import("fov.zig").update_fov;
 
@@ -18,6 +19,7 @@ pub const State_World = struct {
     layers: []World,
     current_layer: usize = 0,
     hero: Hero = .{},
+    flags: State_World_Flags = .{},
     allocator: std.mem.Allocator,
 
     pub fn init(alloc: std.mem.Allocator) !State_World {

@@ -55,17 +55,17 @@ pub const Tile = struct {
                 self.block_movement = false;
                 self.block_vision = false;
             },
-            .floor_grass => return {
-                self.id = 102;
-                self.glyph = "⁙";
-                self.color = c.dark_green;
-                self.block_movement = false;
-                self.block_vision = false;
-            },
             .floor_dirtpath => return {
                 self.id = 101;
                 self.glyph = ":";
                 self.color = c.dark_brown;
+                self.block_movement = false;
+                self.block_vision = false;
+            },
+            .floor_grass => return {
+                self.id = 102;
+                self.glyph = "⁙";
+                self.color = c.dark_green;
                 self.block_movement = false;
                 self.block_vision = false;
             },
@@ -117,7 +117,7 @@ pub const Tile = struct {
                     else => c.light_blue,
                 };
                 self.block_vision = false;
-                self.block_movement = true;
+                self.block_movement = false;
             },
         }
     }

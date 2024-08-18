@@ -33,7 +33,7 @@ pub fn set_fov(state: *State_World) void {
     // tile player is standing on is always visible
     state.layers[state.current_layer].map[state.hero.xpos][state.hero.ypos].visible = true;
 
-    while (mindir <= maxdir) : (mindir += 0.01) {
+    while (mindir <= maxdir) : (mindir += 1) {
         const ax = @cos(dtr(mindir));
         const ay = @sin(dtr(mindir));
 

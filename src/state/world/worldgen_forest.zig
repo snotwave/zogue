@@ -58,24 +58,56 @@ pub fn gen_river(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile, startx: usize, start
     var iter: usize = 0;
 
     while (iter < steps) : (iter +%= 1) {
-        const choice: usize = @mod(rand.int(usize), 350);
+        const choice: usize = @mod(rand.int(usize), 400);
 
-        switch (choice) {
-            0...200 => y -= 1,
-            201...275 => x += 1,
-            276...350 => x -= 1,
-            else => {},
+        if (y > 0) {
+            switch (choice) {
+                0...200 => y -= 1,
+                201...275 => {
+                    y -= 1;
+                    x += 1;
+                },
+                276...350 => {
+                    y -= 1;
+                    x -= 1;
+                },
+                351...375 => x += 2,
+                376...400 => x -= 2,
+                else => {},
+            }
         }
 
         const path_width = 1 + @rem(rand.int(usize), 4);
 
-        if (x <= path_width or y <= path_width) break;
+        if (y >= path_width) {
+            // create river
+            for (x -% path_width..x +% path_width) |i| {
+                for (y -% path_width..y +% path_width) |j| {
+                    if (j >= 0 and cartesian_distance(x, y, i, j) < path_width) {
+                        map[i][j].update(.water);
+                    }
+                }
+            }
+        }
+    }
+}
 
-        // create path
-        for (x -% path_width..x +% path_width) |i| {
-            for (y -% path_width..y +% path_width) |j| {
-                if (i >= c.WORLD_WIDTH or j >= c.WORLD_HEIGHT or i < 0 or j < 0) break;
-                map[i][j].update(.water);
+pub fn pad_river(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile, x: usize, y: usize) void {
+    const padding = 2 + @mod(rand.int(usize), 3);
+
+    if (map[x][y].id == 1000 and map[x +% 1][y].id != 1000) {
+        var i: usize = 1;
+        while (i < padding + 1) : (i +%= 1) {
+            if (map[x +% i][y].id != 1000) {
+                map[x +% i][y].update(.floor_grass);
+            }
+        }
+    }
+    if (map[x][y].id == 1000 and map[x -% 1][y].id != 1000) {
+        var i: usize = 1;
+        while (i < padding + 1) : (i +%= 1) {
+            if (map[x -% i][y].id != 1000) {
+                map[x -% i][y].update(.floor_grass);
             }
         }
     }
@@ -111,31 +143,37 @@ pub fn gen_path(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile, startx: usize, starty
                 x += 1;
             },
             301...350 => y -= 1,
-            //201...250 => {
-            //    y += 1;
-            //    x -%= 1;
-            //},
-            //251...300 => {
-            //    y -%= 1;
-            //    x += 1;
-            //},
             else => {},
         }
 
-        if (x < startx or y < starty) {
-            x = startx;
-            y = starty;
-            iter -%= 1;
-        } else {
-            const path_width = 2 + @rem(rand.int(usize), 2);
+        const path_width = 1 + @rem(rand.int(usize), 2);
 
-            // create path
-            for (x -% path_width..x + path_width) |i| {
-                for (y -% path_width..y + path_width) |j| {
-                    if (i >= c.WORLD_WIDTH or j >= c.WORLD_HEIGHT) break;
-                    map[i][j].update(.floor_dirtpath);
-                    if (i > x + path_width - 3 or j > y + path_width - 3) map[i][j].update(.floor_grass);
-                }
+        // create path
+        for (x -% path_width..x + path_width) |i| {
+            for (y -% path_width..y + path_width) |j| {
+                if (i >= c.WORLD_WIDTH or j >= c.WORLD_HEIGHT) break;
+                map[i][j].update(.floor_dirtpath);
+            }
+        }
+    }
+}
+
+pub fn pad_path(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile, x: usize, y: usize) void {
+    const padding = 1 + @mod(rand.int(usize), 1);
+
+    if (map[x][y].id == 101 and map[x][y +% 1].id != 101) {
+        var i: usize = 1;
+        while (i < padding + 1) : (i +%= 1) {
+            if (map[x][y +% i].id != 101) {
+                map[x][y +% i].update(.floor_grass);
+            }
+        }
+    }
+    if (map[x][y].id == 101 and map[x][y -% 1].id != 101) {
+        var i: usize = 1;
+        while (i < padding + 1) : (i +%= 1) {
+            if (map[x][y -% i].id != 101) {
+                map[x][y -% i].update(.floor_grass);
             }
         }
     }
@@ -143,7 +181,7 @@ pub fn gen_path(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile, startx: usize, starty
 
 pub fn worldgen(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile) void {
     const offset = 60;
-    const riverhead = offset + @mod(rand.int(usize), c.WORLD_WIDTH - offset);
+    const riverhead = offset + @mod(rand.int(usize), c.WORLD_WIDTH - 2 * offset);
 
     gen_noise(map);
     gen_path(map, 8, 8, 2000);
@@ -152,6 +190,13 @@ pub fn worldgen(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile) void {
     for (0..c.WORLD_WIDTH - 15) |x| {
         for (0..c.WORLD_HEIGHT) |y| {
             build_bridge(map, x, y);
+        }
+    }
+
+    for (0..c.WORLD_WIDTH) |x| {
+        for (0..c.WORLD_HEIGHT) |y| {
+            pad_river(map, x, y);
+            pad_path(map, x, y);
         }
     }
 }
