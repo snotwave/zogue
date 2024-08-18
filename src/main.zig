@@ -25,5 +25,7 @@ pub fn main() !void {
     var engine = try s.State_All.init(allocator);
     defer engine.deinit();
 
+    try engine.set();
+
     try engine.run();
 }

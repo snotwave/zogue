@@ -20,10 +20,10 @@ pub const VIEW_RADIUS: usize = 50;
 pub const VIEWBOX_WIDTH: usize = VIEW_WIDTH + 1;
 pub const VIEWBOX_HEIGHT: usize = VIEW_HEIGHT + 1;
 
-pub const UI_GAP: usize = 3;
+pub const UI_GAP: usize = 2;
 
 pub const UI_SIDEBAR_WIDTH: usize = 16;
-pub const UI_MESSAGE_HEIGHT: usize = 4;
+pub const UI_MESSAGE_HEIGHT: usize = 9;
 
 pub const UI_WIDTH = VIEWBOX_WIDTH + UI_GAP + UI_SIDEBAR_WIDTH;
 pub const UI_HEIGHT = VIEWBOX_HEIGHT + UI_GAP + UI_MESSAGE_HEIGHT;
