@@ -3,8 +3,8 @@ const vaxis = @import("vaxis");
 const con = @import("../constants.zig");
 const col = @import("../../colors.zig");
 
-const hline: vaxis.Cell.Character = .{ .grapheme = "┄" };
-const vline: vaxis.Cell.Character = .{ .grapheme = "┊" };
+const hline: vaxis.Cell.Character = .{ .grapheme = "┅" };
+const vline: vaxis.Cell.Character = .{ .grapheme = "┋" };
 const corner: vaxis.Cell.Character = .{ .grapheme = "▓" };
 
 const color: vaxis.Cell.Style = .{ .fg = col.dark_blue };

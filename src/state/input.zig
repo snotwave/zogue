@@ -4,7 +4,7 @@ const st = @import("state.zig");
 
 const Key = vaxis.Key;
 
-pub fn handle_input(state: *st.State_All, key: Key) void {
+pub fn handle_input(state: *st.State_All, key: Key) !void {
     const map = state.state_world;
 
     if (key.matches('q', .{})) {

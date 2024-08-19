@@ -77,7 +77,7 @@ pub fn gen_river(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile, startx: usize, start
             }
         }
 
-        const path_width = 1 + @rem(rand.int(usize), 4);
+        const path_width = 2 + @rem(rand.int(usize), 4);
 
         if (y >= path_width) {
             // create river

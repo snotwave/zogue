@@ -22,8 +22,10 @@ pub const VIEWBOX_HEIGHT: usize = VIEW_HEIGHT + 1;
 
 pub const UI_GAP: usize = 2;
 
-pub const UI_SIDEBAR_WIDTH: usize = 16;
+pub const UI_SIDEBAR_WIDTH: usize = 32;
 pub const UI_MESSAGE_HEIGHT: usize = 9;
 
 pub const UI_WIDTH = VIEWBOX_WIDTH + UI_GAP + UI_SIDEBAR_WIDTH;
 pub const UI_HEIGHT = VIEWBOX_HEIGHT + UI_GAP + UI_MESSAGE_HEIGHT;
+
+pub const UI_MAX_MESSAGES: usize = 16;

@@ -3,12 +3,12 @@ const vaxis = @import("vaxis");
 
 const sa = @import("app/appstate.zig");
 const ui = @import("ui/uistate.zig");
-
 const sw = @import("world/worldstate.zig");
 
 const in = @import("input.zig");
 
 const c = @import("constants.zig");
+const col = @import("../colors.zig");
 
 const Event = union(enum) {
     key_press: vaxis.Key,
@@ -47,9 +47,9 @@ pub const State_All = struct {
     }
 
     pub fn set(self: *State_All) !void {
-        try self.state_ui.message_add("You have awoken in an alien world in a forest with a path. You hear the sound of a rushing river nearby.");
-        try self.state_ui.message_add("Try using the arrow keys to move and shift to strafe. \n");
-        try self.state_ui.message_add("Welcome to the world of Zogue!");
+        try self.state_ui.message_add(.{ .message = "You have awoken in an alien world in a forest with a path. You hear the sound of a rushing river nearby. \n", .style = .{ .fg = col.light_green } });
+        try self.state_ui.message_add(.{ .message = "Try using the arrow keys to move and shift to strafe. \n", .style = .{ .italic = true } });
+        try self.state_ui.message_add(.{ .message = "Welcome to the world of Zogue! \n \n", .style = .{ .bold = true, .fg = col.light_blue } });
     }
 
     pub fn run(self: *State_All) !void {
@@ -92,14 +92,20 @@ pub const State_All = struct {
             .width = .{ .limit = c.UI_WIDTH + 1 },
             .height = .{ .limit = c.UI_HEIGHT + 1 },
         });
+
         const msgwin = win.child(.{
             .x_off = 2,
             .y_off = 1 + c.VIEWBOX_HEIGHT + c.UI_GAP,
             .width = .{ .limit = c.VIEWBOX_WIDTH - 2 },
-            .height = .{ .limit = c.VIEWBOX_HEIGHT },
+            .height = .{ .limit = c.UI_MESSAGE_HEIGHT - 1 },
         });
-        //const current_layer = self.state_world.current_layer;
 
+        const statwin = win.child(.{
+            .x_off = 2 + c.VIEWBOX_WIDTH + c.UI_GAP,
+            .y_off = 1,
+            .width = .{ .limit = c.VIEWBOX_WIDTH - 2 },
+            .height = .{ .limit = c.VIEWBOX_HEIGHT + c.UI_GAP + c.UI_MESSAGE_HEIGHT - 1 },
+        });
         // clear out window
         win.clear();
 
@@ -107,13 +113,13 @@ pub const State_All = struct {
         self.state_world.draw(win);
 
         // draw the ui
-        try self.state_ui.draw(win, msgwin);
+        try self.state_ui.draw(self, win, msgwin, statwin);
     }
 
     pub fn update(self: *State_All, event: Event) !void {
         switch (event) {
             .key_press => |key| {
-                in.handle_input(self, key);
+                try in.handle_input(self, key);
             },
             .winsize => |ws| try self.state_app.instance.resize(self.allocator, self.state_app.terminal.anyWriter(), ws),
         }

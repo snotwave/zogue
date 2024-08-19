@@ -1,16 +1,21 @@
 const std = @import("std");
 const vaxis = @import("vaxis");
+
+const st = @import("../state.zig");
 const ui = @import("ui.zig");
+const c = @import("../constants.zig");
+const sidebar = @import("sidebar.zig");
+const message = @import("messages.zig");
 
 const join = @import("std").mem.join;
 
 pub const State_UI = struct {
     allocator: std.mem.Allocator,
-    messages: std.ArrayList([]const u8),
-    messagelist: []const u8 = "",
+    messages: std.ArrayList(message.message),
+    stats: sidebar.hero_data_strings = .{},
 
     pub fn init(alloc: std.mem.Allocator) !State_UI {
-        const messages = std.ArrayList([]const u8).init(alloc);
+        const messages = std.ArrayList(message.message).init(alloc);
 
         return .{
             .allocator = alloc,
@@ -19,37 +24,41 @@ pub const State_UI = struct {
     }
 
     pub fn deinit(self: *State_UI) void {
+
+        // clear messages arraylist
         self.messages.deinit();
-        self.allocator.free(self.messagelist);
+
+        // clear stats struct (there's probably a nicer way to do this)
+        self.allocator.free(self.stats.hero_level);
+        self.allocator.free(self.stats.hero_health_current);
+        self.allocator.free(self.stats.hero_health_max);
+        self.allocator.free(self.stats.hero_experience_current);
+        self.allocator.free(self.stats.hero_experience_max);
     }
 
-    pub fn draw(self: *State_UI, full_window: vaxis.Window, message_window: vaxis.Window) !void {
+    pub fn draw(self: *State_UI, state: *st.State_All, full_window: vaxis.Window, message_window: vaxis.Window, sidebar_window: vaxis.Window) !void {
         ui.draw_border(full_window);
 
         try self.messages_draw(message_window);
+        try sidebar.draw_stats(state, &self.stats, sidebar_window);
     }
 
-    pub fn message_add(self: *State_UI, message: []const u8) !void {
-        try self.messages.append(message);
+    pub fn message_add(self: *State_UI, mess: message.message) !void {
+        try self.messages.append(mess);
     }
 
     pub fn messages_draw(self: *State_UI, window: vaxis.Window) !void {
-        // free the previously allocated slice consisting of the last 8 messages in the messages arraylist
-        self.allocator.free(self.messagelist);
+        var last_messages: []vaxis.Segment = try self.allocator.alloc(vaxis.Segment, c.UI_MAX_MESSAGES);
+        defer self.allocator.free(last_messages);
 
-        // concatenates the last 8 messages in the messages arraylist into a flat array of slices
-        var last_8_messages: [8][]const u8 = undefined;
-        for (0..8) |i| {
-            if (self.messages.items.len > i)
-                last_8_messages[i] = self.messages.items[self.messages.items.len - i - 1]
-            else
-                last_8_messages[i] = "";
+        for (0..c.UI_MAX_MESSAGES) |i| {
+            if (self.messages.items.len > i) {
+                const this_message = self.messages.items[self.messages.items.len - i - 1];
+
+                last_messages[i] = .{ .text = this_message.message, .style = this_message.style };
+            } else last_messages[i] = .{ .text = "" };
         }
 
-        // concatenates the flat array of slices into a single slice delimited by newlines and stores it in the struct
-        self.messagelist = try join(self.allocator, "\n", &last_8_messages);
-
-        // print the message
-        _ = try window.printSegment(.{ .text = self.messagelist }, .{});
+        _ = try window.print(last_messages, .{});
     }
 };

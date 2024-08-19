@@ -1,0 +1,47 @@
+const std = @import("std");
+const vaxis = @import("vaxis");
+
+const Hero = @import("../../objects/hero.zig").Hero;
+const State = @import("../state.zig").State_All;
+
+pub const hero_data_strings = struct {
+    hero_level: []const u8 = "",
+    hero_health_current: []const u8 = "",
+    hero_health_max: []const u8 = "",
+    hero_experience_current: []const u8 = "",
+    hero_experience_max: []const u8 = "",
+};
+
+pub fn usize_to_slice(arg_int: usize, allocator: std.mem.Allocator) ![]const u8 {
+    return try std.fmt.allocPrint(allocator, "{}", .{arg_int});
+}
+
+pub fn update_stats(state: *State, stats: *hero_data_strings) void {
+    const hero: Hero = state.state_world.hero;
+
+    state.allocator.free(stats.hero_level);
+    stats.hero_level = try usize_to_slice(hero.level_current, state.allocator);
+}
+
+pub fn draw_stats(state: *State, stats: *hero_data_strings, window: vaxis.Window) !void {
+    const hero: Hero = state.state_world.hero;
+
+    update_stats(state, stats);
+
+    const hero_name: []const u8 = hero.name;
+
+    const title_style: vaxis.Cell.Style = .{
+        .bold = true,
+    };
+    const subtitle_style: vaxis.Cell.Style = .{
+        .italic = true,
+    };
+
+    _ = try window.print(&.{
+        .{ .text = hero_name, .style = title_style },
+        .{ .text = "\nLevel ", .style = subtitle_style },
+        .{ .text = stats.hero_level, .style = subtitle_style },
+        .{ .text = "\n \nHealth ", .style = title_style },
+        .{ .text = "\n \nExperience ", .style = title_style },
+    }, .{});
+}

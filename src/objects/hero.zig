@@ -5,13 +5,27 @@ const c = @import("../colors.zig");
 const State_World = @import("../state/world/worldstate.zig").State_World;
 
 pub const Hero = struct {
-    xpos: usize = 20,
-    ypos: usize = 10,
+
+    // position related
+    xpos: usize = 8,
+    ypos: usize = 8,
     dir: usize = 0,
     layer: usize = 0,
 
+    // draw related
     glyph: []const u8 = "Ѧ",
     color: vaxis.Cell.Color = c.violet,
+
+    // gamestate related
+    name: []const u8 = "isabel",
+
+    health_current: usize = 100,
+    health_maximum: usize = 100,
+
+    xp_current: usize = 0,
+    xp_maximum: usize = 100,
+
+    level_current: usize = 1,
 
     pub fn draw(self: *Hero, x: usize, y: usize, window: vaxis.Window) void {
         // add an extra 1 to account for the ui
