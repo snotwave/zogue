@@ -41,7 +41,7 @@ pub const Hero = struct {
         const new_dx: usize = @intCast(dx +% temp_x);
         const new_dy: usize = @intCast(dy +% temp_y);
 
-        if (map[new_dx][new_dy].block_movement == false) {
+        if (map[new_dx][new_dy].block_movement == false and map[new_dx][new_dy].contains_entity == false) {
             self.xpos = new_dx;
             self.ypos = new_dy;
         }

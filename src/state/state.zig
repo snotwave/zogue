@@ -76,6 +76,7 @@ pub const State_All = struct {
                 try self.update(event);
             }
 
+            self.logic();
             try self.draw();
 
             var buffered = self.state_app.terminal.bufferedWriter();
@@ -114,6 +115,10 @@ pub const State_All = struct {
 
         // draw the ui
         try self.state_ui.draw(self, win, msgwin, statwin);
+    }
+
+    pub fn logic(self: *State_All) void {
+        self.state_world.layers[self.state_world.current_layer].logic();
     }
 
     pub fn update(self: *State_All, event: Event) !void {

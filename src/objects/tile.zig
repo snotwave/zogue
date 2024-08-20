@@ -41,8 +41,11 @@ pub const Tile = struct {
     glyph: []const u8 = " ",
     block_movement: bool = false,
     block_vision: bool = false,
+    contains_entity: bool = false,
     visible: bool = false,
     revealed: bool = false,
+
+    bloody: bool = false,
 
     color: vaxis.Cell.Color = c.white,
 
@@ -136,9 +139,14 @@ pub const Tile = struct {
         };
 
         // if tile has been revealed but isn't currently visible draw it grey
-        const style: vaxis.Cell.Style = switch (self.visible) {
+        const pre_style: vaxis.Cell.Style = switch (self.visible) {
             true => .{ .fg = self.color },
             false => .{ .fg = c.grey2 },
+        };
+
+        const style: vaxis.Cell.Style = switch (self.bloody) {
+            true => .{ .fg = c.red },
+            false => pre_style,
         };
 
         // add an extra 1 to account for the ui

@@ -171,6 +171,9 @@ pub fn pad_path(map: *[c.WORLD_WIDTH][c.WORLD_HEIGHT]Tile, x: usize, y: usize) v
     }
     if (map[x][y].id == 101 and map[x][y -% 1].id != 101) {
         var i: usize = 1;
+
+        if (i - 1 < 0) return;
+
         while (i < padding + 1) : (i +%= 1) {
             if (map[x][y -% i].id != 101) {
                 map[x][y -% i].update(.floor_grass);

@@ -55,7 +55,7 @@ pub fn set_fov(state: *State_World) void {
             }
 
             state.layers[state.current_layer].map[ux][uy].visible = true;
-            if (state.layers[state.current_layer].map[ux][uy].block_vision == true) {
+            if (state.layers[state.current_layer].map[ux][uy].block_vision == true or state.layers[state.current_layer].map[ux][uy].contains_entity == true) {
                 break;
             }
         }
